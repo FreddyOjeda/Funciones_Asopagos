@@ -1,0 +1,71 @@
+bod = Map();
+bod.put("grant_type","password");
+bod.put("client_id","apiempleo");
+bod.put("password","T3s7123");
+bod.put("scope","roles");
+bod.put("audience","apiempleo");
+bod.put("client_secret","89a7f412-fefc-4592-a941-8b002ec4987c");
+bod.put("username","Gestrategica");
+response = invokeurl
+[
+	url :"http://35.222.69.253:8080/auth/realms/Desarrollo/protocol/openid-connect/token"
+	type :POST
+	parameters:bod
+	content-type:"application/x-www-form-urlencoded"
+];
+token = response.get("access_token");
+reg = zoho.crm.getRecordById("Conocimientos_Asopagos",registro);
+valor_conocimiento = 0;
+docu = "";
+lista_documentos = {{"CC","Cédula de Ciudadanía"},{"CE","Cédula de Extranjeria"},{"DNI","Documento Nacional de Identificación"},{"ETN","Empresa Transnacional"},{"NIT","NIT"},{"PA","Pasaporte"},{"PECP","Permiso Especial Complementario de Permanencia"},{"PEP","Permiso Especial de Permanencia"},{"PEPF","Permiso Especial de Permanencia para el Fomento de la Formalización"},{"PETT","Permiso Especial Temporal de Trabajo"},{"PPT","Permiso por Protección Temporal"},{"TI","Tarjeta de Identidad"}};
+for each  valor in lista_documentos
+{
+	if(valor.get(1) == reg.get("Tipo_Documento"))
+	{
+		docu = valor.get(0);
+		break;
+	}
+}
+lista_valores = {{"Procesador de texto (Ejemplo: Word)",23},{"Hoja de cálculo (Ejemplo: Excel)",24},{"Multimedia (Ejemplo: PowerPoint)",25},{"Otros",26}};
+for each  valor in lista_valores
+{
+	if(valor.get(0) == reg.get("Tipo_Conocimiento"))
+	{
+		valor_conocimiento = valor.get(1);
+		break;
+	}
+}
+conocimiento = Map();
+conocimiento.put("persoId",reg.get("ID_Persona"));
+conocimiento.put("ofiId",valor_conocimiento);
+conocimiento.put("nivel",reg.get("Nivel_de_manejo"));
+conocimiento.put("ofiTipoDesc",reg.get("Nombre_Conocimiento"));
+body = Map();
+body.put("tipoDocumento",docu);
+body.put("numDocumento",reg.get("No_Documento"));
+body.put("otrosConocimientos",conocimiento);
+data = body.toString();
+header = Map();
+header.put("Authorization","Bearer " + token);
+res = invokeurl
+[
+	url :"http://104.198.32.44:8080/api/cliente/AgregarOtrosConocimientos"
+	type :POST
+	parameters:data
+	headers:header
+	content-type:"application/json"
+];
+if(res.get("data") != "false" && res.get("status") == 200)
+{
+	reg.put("Ofimatica",res.get("data").get("ofimaticaId"));
+	update = zoho.crm.updateRecord("Conocimientos_Asopagos",registro,reg);
+	return "La informacion fue enviada y guardada con exito. ofimatica:" + res.get("data").get("ofimaticaId");
+}
+else if(res.get("status") == 200)
+{
+	return res.get("title");
+}
+else
+{
+	return "Error con el servidor externo: " + res;
+}

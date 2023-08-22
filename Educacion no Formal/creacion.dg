@@ -1,0 +1,92 @@
+String agregarEduNoFormal(String registro){
+	bod = Map();
+	bod.put("grant_type","password");
+	bod.put("client_id","apiempleo");
+	bod.put("password","T3s7123");
+	bod.put("scope","roles");
+	bod.put("audience","apiempleo");
+	bod.put("client_secret","89a7f412-fefc-4592-a941-8b002ec4987c");
+	bod.put("username","Gestrategica");
+	response = invokeurl
+	[
+		url :"http://35.222.69.253:8080/auth/realms/Desarrollo/protocol/openid-connect/token"
+		type :POST
+		parameters:bod
+		content-type:"application/x-www-form-urlencoded"
+	];
+	token = response.get("access_token");
+	reg = zoho.crm.getRecordById("EduNoFormal_ASOPAGOS",registro);
+	docu = "";
+	pais = "";
+	certificado = 0;
+	lista_documentos = {{"CC","Cédula de Ciudadanía"},{"CE","Cédula de Extranjeria"},{"DNI","Documento Nacional de Identificación"},{"ETN","Empresa Transnacional"},{"NIT","NIT"},{"PA","Pasaporte"},{"PECP","Permiso Especial Complementario de Permanencia"},{"PEP","Permiso Especial de Permanencia"},{"PEPF","Permiso Especial de Permanencia para el Fomento de la Formalización"},{"PETT","Permiso Especial Temporal de Trabajo"},{"PPT","Permiso por Protección Temporal"},{"TI","Tarjeta de Identidad"}};
+	for each  valor in lista_documentos
+	{
+		if(valor.get(1) == reg.get("Tipo_Documento"))
+		{
+			docu = valor.get(0);
+			break;
+		}
+	}
+	lista_paises = {{"AD","Andorra"},{"AE","Emiratos Árabes Unidos"},{"AF","Afganistán"},{"AG","Antigua y Barbuda"},{"AI","Anguilla"},{"AL","Albania"},{"AM","Armenia"},{"AN","Antillas Holandesas"},{"AO","Angola"},{"AQ","Antártida"},{"AR","Argentina"},{"AS","Samoa Americana"},{"AT","Austria"},{"AU","Australia"},{"AW","Aruba"},{"AX","Islas Gland"},{"AZ","Azerbaiyán"},{"BA","Bosnia y Herzegovina"},{"BB","Barbados"},{"BD","Bangladesh"},{"BE","Bélgica"},{"BF","Burkina Faso"},{"BG","Bulgaria"},{"BH","Bahréin"},{"BI","Burundi"},{"BJ","Benin"},{"BM","Bermudas"},{"BN","Brunéi"},{"BO","Bolivia"},{"BR","Brasil"},{"BS","Bahamas"},{"BT","Bhután"},{"BW","Botsuana"},{"BY","Bielorrusia"},{"BZ","Belice"},{"CA","Canadá"},{"CC","Islas Cocos"},{"CD","República Democrática del Congo"},{"CF","República Centroafricana"},{"CG","Congo"},{"CH","Suiza"},{"CI","Costa de Marfil"},{"CK","Islas Cook"},{"CL","Chile"},{"CM","Camerún"},{"CN","China"},{"CO","Colombia"},{"CR","Costa Rica"},{"CS","Serbia y Montenegro"},{"CU","Cuba"},{"CV","Cabo Verde"},{"CY","Chipre"},{"CZ","República Checa"},{"DE","Alemania"},{"DJ","Yibuti"},{"DK","Dinamarca"},{"DM","Dominica"},{"DO","República Dominicana"},{"DZ","Argelia"},{"EC","Ecuador"},{"EE","Estonia"},{"EG","Egipto"},{"EH","Sahara Occidental"},{"ER","Eritrea"},{"ES","España"},{"ET","Etiopía"},{"FI","Finlandia"},{"FJ","Fiyi"},{"FK","Islas Malvinas"},{"FM","Micronesia"},{"FO","Islas Feroe"},{"FR","Francia"},{"GA","Gabón"},{"GB","Reino Unido"},{"GD","Granada"},{"GE","Georgia"},{"GF","Guayana Francesa"},{"GH","Ghana"},{"GI","Gibraltar"},{"GL","Groenlandia"},{"GM","Gambia"},{"GN","Guinea"},{"GP","Guadalupe"},{"GQ","Guinea Ecuatorial"},{"GR","Grecia"},{"GT","Guatemala"},{"GU","Guam"},{"GW","Guinea-Bissau"},{"GY","Guyana"},{"HK","Hong Kong"},{"HN","Honduras"},{"HR","Croacia"},{"HT","Haití"},{"HU","Hungría"},{"ID","Indonesia"},{"IE","Irlanda"},{"IL","Israel"},{"IN","India"},{"IQ","Iraq"},{"IR","Irán"},{"IS","Islandia"},{"IT","Italia"},{"JM","Jamaica"},{"JO","Jordania"},{"JP","Japón"},{"KE","Kenia"},{"KG","Kirguistán"},{"KH","Camboya"},{"KI","Kiribati"},{"KM","Comoras"},{"KN","San Cristóbal y Nevis"},{"KP","Corea del Norte"},{"KR","Corea del Sur"},{"KW","Kuwait"},{"KY","Islas Caimán"},{"KZ","Kazajstán"},{"LA","Laos"},{"LB","Líbano"},{"LC","Santa Lucía"},{"LI","Liechtenstein"},{"LK","Sri Lanka"},{"LR","Liberia"},{"LS","Lesotho"},{"LT","Lituania"},{"LU","Luxemburgo"},{"LV","Letonia"},{"LY","Libia"},{"MA","Marruecos"},{"MC","Mónaco"},{"MD","Moldavia"},{"MG","Madagascar"},{"MH","Islas Marshall"},{"MK","ARY Macedonia"},{"ML","Malí"},{"MM","Myanmar"},{"MN","Mongolia"},{"MO","Macao"},{"MP","Islas Marianas del Norte"},{"MQ","Martinica"},{"MR","Mauritania"},{"MS","Montserrat"},{"MT","Malta"},{"MU","Mauricio"},{"MV","Maldivas"},{"MW","Malawi"},{"MX","México"},{"MY","Malasia"},{"MZ","Mozambique"},{"NA","Namibia"},{"NC","Nueva Caledonia"},{"NE","Níger"},{"NF","Isla Norfolk"},{"NG","Nigeria"},{"NI","Nicaragua"},{"NL","Países Bajos"},{"NO","Noruega"},{"NP","Nepal"},{"NR","Nauru"},{"NU","Niue"},{"NZ","Nueva Zelanda"},{"OM","Omán"},{"PA","Panamá"},{"PE","Perú"},{"PF","Polinesia Francesa"},{"PG","Papúa Nueva Guinea"},{"PH","Filipinas"},{"PK","Pakistán"},{"PL","Polonia"},{"PM","San Pedro y Miquelón"},{"PN","Islas Pitcairn"},{"PR","Puerto Rico"},{"PS","Palestina"},{"PT","Portugal"},{"PW","Palau"},{"PY","Paraguay"},{"QA","Qatar"},{"RE","Reunión"},{"RO","Rumania"},{"RU","Rusia"},{"RW","Ruanda"},{"SA","Arabia Saudí"},{"SB","Islas Salomón"},{"SC","Seychelles"},{"SD","Sudán"},{"SE","Suecia"},{"SG","Singapur"},{"SH","Santa Helena"},{"SI","Eslovenia"},{"SJ","Svalbard y Jan Mayen"},{"SK","Eslovaquia"},{"SL","Sierra Leona"},{"SM","San Marino"},{"SN","Senegal"},{"SO","Somalia"},{"SR","Surinam"},{"ST","Santo Tomé y Príncipe"},{"SV","El Salvador"},{"SY","Siria"},{"SZ","Suazilandia"},{"TC","Islas Turcas y Caicos"},{"TD","Chad"},{"TG","Togo"},{"TH","Tailandia"},{"TJ","Tayikistán"},{"TK","Tokelau"},{"TL","Timor Oriental"},{"TM","Turkmenistán"},{"TN","Túnez"},{"TO","Tonga"},{"TR","Turquía"},{"TT","Trinidad y Tobago"},{"TV","Tuvalu"},{"TW","Taiwán"},{"TZ","Tanzania"},{"UA","Ucrania"},{"UG","Uganda"},{"US","Estados Unidos"},{"UY","Uruguay"},{"UZ","Uzbekistán"},{"VA","Ciudad del Vaticano"},{"VC","San Vicente y las Granadinas"},{"VE","Venezuela"},{"VG","Islas Vírgenes Británicas"},{"VI","Islas Vírgenes de los Estados Unidos"},{"VN","Vietnam"},{"VU","Vanuatu"},{"WF","Wallis y Futuna"},{"WS","Samoa"},{"YE","Yemen"},{"YT","Mayotte"},{"ZA","Sudáfrica"},{"ZM","Zambia"},{"ZW","Zimbabue"}};
+	for each  valor in lista_paises
+	{
+		if(valor.get(1) == reg.get("ID_Pais"))
+		{
+			pais = valor.get(0);
+			break;
+		}
+	}
+	lista_tipos_eventos = {{1,"Curso"},{2,"Taller"},{3,"Diplomado"},{4,"Seminario"},{5,"Certificación de Competencias"}};
+	for each  valor in lista_tipos_eventos
+	{
+		if(valor.get(1) == reg.get("ID_Certificado"))
+		{
+			certificado = valor.get(0);
+			break;
+		}
+	}
+	tDocumento = docu;
+	documento = reg.get("No_Documento");
+	educacion = Map();
+	educacion.put("persoId",reg.get("ID_Persona"));
+	educacion.put("tituNombre",reg.get("Nombre_del_titulo"));
+	educacion.put("instiNombre",reg.get("Nombre_del_instituto"));
+	educacion.put("paisId",pais);
+	educacion.put("fechaIni",reg.get("Fecha_de_inicio"));
+	educacion.put("fechaFin",reg.get("Fecha_de_fin"));
+	educacion.put("resuLogros",reg.get("Resultado_de_logros"));
+	educacion.put("practiCk",reg.get("Practica_S_N"));
+	educacion.put("idTipoCertificado",certificado);
+	educacion.put("estadoCertificacion",reg.get("Certificacion"));
+	educacion.put("cantidadHora",reg.get("Cant_Horas"));
+	body = Map();
+	body.put("tipoDocumento",tDocumento);
+	body.put("numDocumento",documento);
+	body.put("eduNoFormal",educacion);
+	data = body.toString();
+	header = Map();
+	header.put("Authorization","Bearer " + token);
+	res = invokeurl
+	[
+		url :"http://104.198.32.44:8080/api/cliente/AgregarEducacionNoFormal"
+		type :POST
+		parameters:data
+		headers:header
+		content-type:"application/json"
+	];
+	if(res.get("title") == "OK" && res.get("status") == 200)
+	{
+		reg.put("idUk",res.get("data").get("idUk"));
+		update = zoho.crm.updateRecord("EduNoFormal_ASOPAGOS",registro,reg);
+		return "La informacion fue enviada y guardada con exito." + res.get("data");
+	}
+	else if(res.get("status") == 200)
+	{
+		return "Error con la informacion proporcionada: " + res.get("data");
+	}
+	else
+	{
+		return "Error con el servidor externo: " + res.get("errors");
+	}
+}

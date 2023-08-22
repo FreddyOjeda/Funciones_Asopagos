@@ -1,0 +1,76 @@
+function(String registro){
+    bod = Map();
+    bod.put("grant_type","password");
+    bod.put("client_id","apiempleo");
+    bod.put("password","T3s7123");
+    bod.put("scope","roles");
+    bod.put("audience","apiempleo");
+    bod.put("client_secret","89a7f412-fefc-4592-a941-8b002ec4987c");
+    bod.put("username","Gestrategica");
+    response = invokeurl
+    [
+        url :"http://35.222.69.253:8080/auth/realms/Desarrollo/protocol/openid-connect/token"
+        type :POST
+        parameters:bod
+        content-type:"application/x-www-form-urlencoded"
+    ];
+    token = response.get("access_token");
+    reg = zoho.crm.getRecordById("Idiomas_ASOPAGOS",registro);
+    docu = "";
+    lista_documentos = {{"CC","Cédula de Ciudadanía"},{"CE","Cédula de Extranjeria"},{"DNI","Documento Nacional de Identificación"},{"ETN","Empresa Transnacional"},{"NIT","NIT"},{"PA","Pasaporte"},{"PECP","Permiso Especial Complementario de Permanencia"},{"PEP","Permiso Especial de Permanencia"},{"PEPF","Permiso Especial de Permanencia para el Fomento de la Formalización"},{"PETT","Permiso Especial Temporal de Trabajo"},{"PPT","Permiso por Protección Temporal"},{"TI","Tarjeta de Identidad"}};
+    for each  valor in lista_documentos
+    {
+        if(valor.get(1) == reg.get("Tipo_Documento"))
+        {
+            docu = valor.get(0);
+            break;
+        }
+    }
+    valor_idioma = "";
+    lista_idiomas = {{"001","Alemán"},{"002","Arabe"},{"003","Búlgaro"},{"004","Catalán"},{"005","Checo"},{"006","Chino"},{"007","Coreano"},{"008","Eslovaco"},{"009","Esloveno"},{"010","Español"},{"011","Estonio"},{"012","Finlandés"},{"013","Frances"},{"014","Griego"},{"015","Hebreo"},{"016","Holandés"},{"017","Húngaro"},{"018","Indonesio"},{"019","Inglés"},{"020","Islandés"},{"021","Italiano"},{"022","Japonés"},{"023","Letonia"},{"024","Lituano"},{"025","Neerlandés"},{"026","Noruego"},{"027","Polaco"},{"028","Portugués"},{"029","Rumano"},{"030","Ruso"},{"031","Serbio"},{"032","Sueco"},{"033","Turco"},{"034","Lengua de señas para sordos"},{"035","Achagua"},{"036","Arhuaco"},{"037","Awa"},{"038","Baniva"},{"039","Barbacoas"},{"040","Barí"},{"041","Bora"},{"042","Cabiyarí"},{"043","Chimila"},{"044","Coconuco"},{"045","Cuaiquer"},{"046","Curripaco"},{"047","Dorasque"},{"048","Guaibo"},{"049","Guatuso"},{"050","Guaymí"},{"051","Jucuna"},{"052","Kamsá"},{"053","Macu"},{"054","Matagalpa"},{"055","Misquito"},{"056","Motilon"},{"057","Paéz"},{"058","Paya"},{"059","Piapoco"},{"060","Puinave"},{"061","Quechua"},{"062","Saliba"},{"063","Sibundoy"},{"064","Talamanca"},{"065","Ticuna"},{"066","Tunebo"},{"067","Wayúu"},{"068","Witoto"},{"069","Yucuna"},{"070","Creole"},{"073","Otro"}};
+    for each  valor in lista_idiomas
+    {
+        if(valor.get(1) == reg.get("ID_Idioma"))
+        {
+            valor_idioma = valor.get(0);
+            break;
+        }
+    }
+    tDocumento = docu;
+    documento = reg.get("Name");
+    idioma = Map();
+    idioma.put("persoId",reg.get("ID_Persona"));
+    idioma.put("idioId",valor_idioma);
+    idioma.put("nivel",reg.get("Nivel"));
+    body = Map();
+    body.put("tipoDocumento",tDocumento);
+    body.put("numDocumento",documento);
+    body.put("idioma",idioma);
+    data = body.toString();
+    header = Map();
+    header.put("Authorization","Bearer " + token);
+    res = invokeurl
+    [
+        url :"http://104.198.32.44:8080/api/cliente/AgregarIdiomaPrestador"
+        type :POST
+        parameters:data
+        headers:header
+        content-type:"application/json"
+    ];
+    if(res.get("title") == "OK " && res.get("status") == 200)
+    {
+        if(res.get("data") == "error: An error occurred while updating the entries. See the inner exception for details.")
+        {
+            return "El Usuario ya tiene agregado ese idioma, click en boton 'Actualizar'";
+        }
+        return "La informacion fue enviada y guardada con exito." + res.get("data");
+    }
+    else if(res.get("status") == 200)
+    {
+        return "Error en la informacion:" + res;
+    }
+    else
+    {
+        return "Error con el servidor externo: " + res.get("data");
+    }
+}
